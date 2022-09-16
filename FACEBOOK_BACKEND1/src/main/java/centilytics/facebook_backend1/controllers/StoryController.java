@@ -51,7 +51,6 @@ public class StoryController {
     public ResponseEntity<Object> createStory(@PathVariable(value = "userId") Long userId, @RequestBody PrivateStoryDto
             privateStoryDto ) throws Exception{
         System.out.println(privateStoryDto);
-        // if (privateStoryDto == null) return null;
         Story story = storyService.createStory(privateStoryDto, userId);
         if(privateStoryDto.getType() == BodyType.PUBLIC){ return ResponseHandler
                 .generateResponse(HttpStatus.CREATED, "Story created successfully.", story.getId());
