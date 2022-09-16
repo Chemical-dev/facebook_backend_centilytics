@@ -6,17 +6,9 @@ import centilytics.facebook_backend1.models.User;
 import centilytics.facebook_backend1.repository.MyUserRepository;
 import centilytics.facebook_backend1.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +17,6 @@ public class ServiceImpl implements UserService {
 
     @Autowired
     private MyUserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
 
     @Override
     public String deleteUser(Long id, String email) throws Exception {
@@ -71,8 +61,4 @@ public class ServiceImpl implements UserService {
         return userList;
     }
 
-//    @Bean
-//    public BCryptPasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
 }

@@ -50,18 +50,8 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"), 
         inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
-  @OneToMany
-  List<EmailVault> emailVaults;
 
   public User() {
-  }
-
-  public List<EmailVault> getEmailVaults() {
-    return emailVaults;
-  }
-
-  public void setEmailVaults(List<EmailVault> emailVaults) {
-    this.emailVaults = emailVaults;
   }
 
   public User(String firstName, String lastName, String username, String email, String password, Date dob) {
