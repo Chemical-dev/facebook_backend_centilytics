@@ -28,7 +28,7 @@ public class UserController {
                 .generateResponse(HttpStatus.BAD_REQUEST, "FIELDS CANNOT BE EMPTY", null);
         this.userServiceImpl.deleteUser(deleteRequest.getId(), deleteRequest.getEmail());
         return ResponseHandler
-                .generateResponse(HttpStatus.ACCEPTED, "USER DELETED SUCCESSFULLY", null);
+                .generateResponse(HttpStatus.OK, "USER DELETED SUCCESSFULLY", null);
     }
 
     @GetMapping("/users")
@@ -36,7 +36,7 @@ public class UserController {
     public ResponseEntity<Object>  getAllUsers() throws Exception{
         List<User> userList = this.userServiceImpl.getAllUsers();
         return ResponseHandler
-                .generateResponse(HttpStatus.ACCEPTED, "USERS FETCHED SUCCESSFULLY", userList);
+                .generateResponse(HttpStatus.OK, "USERS FETCHED SUCCESSFULLY", userList);
     }
 
     @PutMapping("/{id}")
@@ -44,7 +44,7 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@PathVariable("id") Long userId, @RequestBody updateDto updateDto) throws Exception{
       User updatedUser = this.userServiceImpl.updateUser(userId, updateDto);
       return ResponseHandler
-              .generateResponse(HttpStatus.ACCEPTED, "USERS UPDATED SUCCESSFULLY", updatedUser);
+              .generateResponse(HttpStatus.OK, "USERS UPDATED SUCCESSFULLY", updatedUser);
     }
 
     @GetMapping("/{id}")
@@ -52,7 +52,9 @@ public class UserController {
     public ResponseEntity<Object> userDetails(@PathVariable("id") Long userId) throws Exception{
         User user = this.userServiceImpl.userDetails(userId);
         return ResponseHandler
-                .generateResponse(HttpStatus.ACCEPTED, "USERS FETCHED SUCCESSFULLY", user);
+                .generateResponse(HttpStatus.OK, "USERS FETCHED SUCCESSFULLY", user);
     }
+
+
 
 }

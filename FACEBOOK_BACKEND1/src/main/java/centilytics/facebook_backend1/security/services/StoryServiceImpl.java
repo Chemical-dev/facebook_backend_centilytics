@@ -75,15 +75,9 @@ public class StoryServiceImpl implements StoryService {
     public StoryResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
-
-        // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
         Page<Story> stories = storyRepository.findAll(pageable);
-
-        // get content for page object
         List<Story> listOfPosts = stories.getContent();
-
         List<StoryDto> content= listOfPosts.stream().map(story -> mapToDTO(story)).collect(Collectors.toList());
 
         StoryResponse postResponse = new StoryResponse();

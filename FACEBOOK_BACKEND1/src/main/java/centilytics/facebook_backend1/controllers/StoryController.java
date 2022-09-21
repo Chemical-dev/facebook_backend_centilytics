@@ -24,12 +24,16 @@ public class StoryController {
 
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('USER')")
-    public ResponseHandler deleteStory(@RequestBody DeleteUser deleteUser) throws Exception{
-        if (deleteUser.getId() == null || deleteUser.getUserId() == null ) return null;
+    public ResponseEntity<Object> deleteStory(@RequestBody DeleteUser deleteUser) throws Exception{
+        if (deleteUser.getId() == null || deleteUser.getUserId() == null ) return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST,
+                "Field Cannot be Empty", null);
     try {
         this.storyService.deleteStory(deleteUser.getId(), deleteUser.getUserId());
+        return ResponseHandler.generateResponse(HttpStatus.ACCEPTED, "Story Deleted Successfully", null);
     }catch (Exception exception){
          System.out.println(exception);
+         ResponseHandler.generateResponse(HttpStatus.EXPECTATION_FAILED,
+                 "Something Went Wrong", null);
      }
     return null;
     }
@@ -39,6 +43,8 @@ public class StoryController {
     public StoryResponse getAllStories(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+//            @RequestParam(value = "start", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int start,
+//          @RequestParam(value = "count", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int count,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir,
             @RequestBody User user
@@ -52,8 +58,9 @@ public class StoryController {
             privateStoryDto ) throws Exception{
         System.out.println(privateStoryDto);
         Story story = storyService.createStory(privateStoryDto, userId);
-        if(privateStoryDto.getType() == BodyType.PUBLIC){ return ResponseHandler
-                .generateResponse(HttpStatus.CREATED, "Story created successfully.", story.getId());
+        if(privateStoryDto.getType() == BodyType.RESTRICTED){
+            System.out.println(story);
+            return ResponseHandler.generateResponse(HttpStatus.OK, "Story created successfully.", story);
         }else {
          return null;
         }
