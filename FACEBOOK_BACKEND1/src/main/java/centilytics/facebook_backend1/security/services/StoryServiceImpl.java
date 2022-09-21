@@ -5,52 +5,49 @@ import centilytics.facebook_backend1.dtos.StoryDto;
 import centilytics.facebook_backend1.dtos.StoryResponse;
 import centilytics.facebook_backend1.models.*;
 import centilytics.facebook_backend1.repository.MyUserRepository;
-import centilytics.facebook_backend1.repository.PrivateStoryRepository;
-import centilytics.facebook_backend1.repository.PublicStoryRepository;
 import centilytics.facebook_backend1.repository.StoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class StoryServiceImpl implements StoryService {
-    @Autowired
-    private PrivateStoryRepository privateStoryRepository;
-    @Autowired
-    private PublicStoryRepository publicStoryRepository;
+
     @Autowired
     private StoryRepository storyRepository;
     @Autowired
     private MyUserRepository userRepository;
 
     @Override
-    public Story createStory(PrivateStoryDto privateStoryDto, Long userId) throws Exception {
+    public Story createStory(StoryDto storyDto, Long userId) throws Exception {
         Optional<User> user = userRepository.findById(userId);
         User user1 = user.orElseThrow(() ->
                 new Exception("No user found with id : " + userId));
         System.out.println(user1);
         Story story = new Story();
-        if(privateStoryDto.getType() == BodyType.RESTRICTED){
-            PrivateStory privateStory = new PrivateStory();
-            privateStory.setHeading(privateStoryDto.getHeading());
-            privateStory.setBody(privateStoryDto.getBody());
-            privateStory.setType(privateStoryDto.getType());
-            story.setPrivateStory(privateStory);
-            privateStoryRepository.save(privateStory);
+        if(storyDto.getType() == BodyType.RESTRICTED){
+            story.setHeading(storyDto.getHeading());
+            story.setBody(storyDto.getBody());
+            story.setType(storyDto.getType());
+            List<User> userList = new ArrayList<>();
+            for(User user2 : userList){
+                if (story.getEmailVaults().contains(user2.getEmailVault())){
+                    user2.getStoryList().add(story);
+                }
+            }
         }else {
-            PublicStory publicStory = new PublicStory();
-            publicStory.setHeading(privateStoryDto.getHeading());
-            publicStory.setBody(privateStoryDto.getBody());
-            publicStory.setType(privateStoryDto.getType());
-            story.setPublicStory(publicStory);
-            publicStoryRepository.save(publicStory);
+            story.setHeading(storyDto.getHeading());
+            story.setBody(storyDto.getBody());
+            story.setType(storyDto.getType());
         }
         story.setUser(user1);
         Story story2 = storyRepository.save(story);
@@ -72,22 +69,18 @@ public class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public StoryResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public StoryResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir, String email ) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
-
-        // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
         Page<Story> stories = storyRepository.findAll(pageable);
-
-        // get content for page object
-        List<Story> listOfPosts = stories.getContent();
-
+        List<Story> listOfPosts =  stories.stream().filter(story -> story.getUser()
+                .getEmail().equals(email)).toList();
+        System.out.println(listOfPosts);
         List<StoryDto> content= listOfPosts.stream().map(story -> mapToDTO(story)).collect(Collectors.toList());
 
         StoryResponse postResponse = new StoryResponse();
-        postResponse.setContent(content);
+        postResponse.setContent(listOfPosts);
         postResponse.setPageNo(stories.getNumber());
         postResponse.setPageSize(stories.getSize());
         postResponse.setTotalElements(stories.getTotalElements());
@@ -99,8 +92,7 @@ public class StoryServiceImpl implements StoryService {
 
     private StoryDto mapToDTO(Story story){
         StoryDto postDto = new StoryDto();
-        postDto.setPrivateStory(story.getPrivateStory());
-        postDto.setPublicStory(story.getPublicStory());
+
         postDto.setUser(story.getUser());
         return postDto;
     }

@@ -2,6 +2,7 @@ package centilytics.facebook_backend1.security;
 
 import centilytics.facebook_backend1.security.jwt.AuthEntryPointJwt;
 import centilytics.facebook_backend1.security.jwt.AuthTokenFilter;
+import centilytics.facebook_backend1.security.services.UserDetailsImpl;
 import centilytics.facebook_backend1.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -59,7 +61,7 @@ public class WebSecurityConfig {
     http.cors().and().csrf().disable()
         .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        .authorizeRequests().antMatchers("/facebook/auth/**").permitAll()
+        .authorizeRequests()
         .antMatchers("/story/**").permitAll()
             .antMatchers("/facebook/user/**").permitAll()
         .anyRequest().authenticated();
